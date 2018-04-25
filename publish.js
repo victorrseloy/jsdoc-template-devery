@@ -417,6 +417,7 @@ exports.publish = function (taffyData, opts, tutorials) {
   helper.setTutorials(tutorials);
 
   data = helper.prune(data);
+  console.log(data);
   if (!conf.disableSort) {
     data.sort('longname, version, since');
   }
