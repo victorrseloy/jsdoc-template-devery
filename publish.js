@@ -288,7 +288,6 @@ function attachModuleSymbols(doclets, modules) {
 function buildMemberNav(items, itemHeading, itemsSeen, linktoFn) {
   var nav = '';
   var itemsNav = '';
-
   if (items && items.length) {
     items.forEach(function (item) {
       var methods = find({kind: 'function', memberof: item.longname});
@@ -324,9 +323,9 @@ function buildMemberNav(items, itemHeading, itemsSeen, linktoFn) {
 }
 
 // TODO: as needed, comment back in later
-// function linktoTutorial(longName, name) {
-//   return tutoriallink(name);
-// }
+function linktoTutorial(longName, name) {
+  return tutoriallink(name);
+}
 
 // function linktoExternal(longName, name) {
 //   return linkto(longName, name.replace(/(^"|"$)/g, ''));
@@ -350,8 +349,9 @@ function buildNav(members) {
   var nav = '';
   var globalNav = '';
   var seen = {};
-  // var seenTutorials = {};
+  var seenTutorials = {};
 
+  nav += buildMemberNav(members.tutorials, 'Guides', seenTutorials, linktoTutorial);
   nav += buildMemberNav(members.classes, 'Classes', seen, linkto);
   nav += buildMemberNav(members.modules, 'Modules', {}, linkto);
   // TODO: as needed, comment back in later
@@ -359,7 +359,6 @@ function buildNav(members) {
   // nav += buildMemberNav(members.events, 'Events', seen, linkto);
   // nav += buildMemberNav(members.namespaces, 'Namespaces', seen, linkto);
   // nav += buildMemberNav(members.mixins, 'Mixins', seen, linkto);
-  // nav += buildMemberNav(members.tutorials, 'Tutorials', seenTutorials, linktoTutorial);
   // nav += buildMemberNav(members.interfaces, 'Interfaces', seen, linkto);
 
   if (members.globals.length) {
@@ -417,7 +416,7 @@ exports.publish = function (taffyData, opts, tutorials) {
   helper.setTutorials(tutorials);
 
   data = helper.prune(data);
-  console.log(data().first());
+  // console.log(data().first());
   if (!conf.disableSort) {
     data.sort('version, longname');
   }
@@ -559,8 +558,10 @@ exports.publish = function (taffyData, opts, tutorials) {
   });
 
   var members = helper.getMembers(data);
-
   members.tutorials = tutorials.children;
+  // console.log(members.tutorials )
+
+ 
 
     // output pretty-printed source files by default
   var outputSourceFiles = conf.default && conf.default.outputSourceFiles !== false;
@@ -645,8 +646,8 @@ exports.publish = function (taffyData, opts, tutorials) {
     // TODO: move the tutorial functions to templateHelper.js
   function generateTutorial(title, tutorial, filename) {
     var tutorialData = {
-      title: title,
-      header: tutorial.title,
+      title: '',
+      header: '',
       content: tutorial.parse(),
       children: tutorial.children
     };
@@ -662,7 +663,7 @@ exports.publish = function (taffyData, opts, tutorials) {
     // tutorials can have only one parent so there is no risk for loops
   function saveChildren(node) {
     node.children.forEach(function (child) {
-      generateTutorial('Tutorial: ' + child.title, child, helper.tutorialToUrl(child.name));
+      generateTutorial(child.title, child, helper.tutorialToUrl(child.name));
       saveChildren(child);
     });
   }
